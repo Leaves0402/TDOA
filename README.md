@@ -526,9 +526,7 @@ $$
 因此：
 
 $$
-\Delta p_k
-=
--(J_k^TJ_k+\lambda I)^{-1}J_k^Te_k
+\Delta p_k=-(J_k^TJ_k+\lambda I)^{-1}J_k^Te_k
 $$
 
 實作時建議解線性系統。
@@ -581,20 +579,7 @@ $$
 Jacobian 變為：
 
 $$
-J_i(p)=
-\begin{bmatrix}
-\frac{x-x_i}{\|p-s_i\|}
--
-\frac{x-x_{ref}}{\|p-s_{ref}\|}
-&
-\frac{y-y_i}{\|p-s_i\|}
--
-\frac{y-y_{ref}}{\|p-s_{ref}\|}
-&
-\frac{z-z_i}{\|p-s_i\|}
--
-\frac{z-z_{ref}}{\|p-s_{ref}\|}
-\end{bmatrix}
+J_i(p)=\begin{bmatrix}\frac{x-x_i}{\|p-s_i\|}-\frac{x-x_{ref}}{\|p-s_{ref}\|}&\frac{y-y_i}{\|p-s_i\|}-\frac{y-y_{ref}}{\|p-s_{ref}\|}&\frac{z-z_i}{\|p-s_i\|}-\frac{z-z_{ref}}{\|p-s_{ref}\|}\end{bmatrix}
 $$
 
 三維線性初始解的未知向量為：
@@ -618,22 +603,11 @@ $$
 第 $i$ 列矩陣為：
 
 $$
-A_i=
-\begin{bmatrix}
-2(x_{ref}-x_i) &
-2(y_{ref}-y_i) &
-2(z_{ref}-z_i) &
--2\rho_i
-\end{bmatrix}
+A_i=\begin{bmatrix}2(x_{ref}-x_i) &2(y_{ref}-y_i) &2(z_{ref}-z_i) &-2\rho_i\end{bmatrix}
 $$
 
 $$
-b_i=
-x_{ref}^2+y_{ref}^2+z_{ref}^2
--
-x_i^2-y_i^2-z_i^2
-+
-\rho_i^2
+b_i=x_{ref}^2+y_{ref}^2+z_{ref}^2-x_i^2-y_i^2-z_i^2+\rho_i^2
 $$
 
 ---

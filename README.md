@@ -43,17 +43,13 @@ $$
 聲源到第 $i$ 顆感測器的距離：
 
 $$
-d_i=\|p-s_i\|
-=
-\sqrt{(x-x_i)^2+(y-y_i)^2}
+d_i=\|p-s_i\|=\sqrt{(x-x_i)^2+(y-y_i)^2}
 $$
 
 聲源到 reference sensor 的距離：
 
 $$
-d_{ref}=\|p-s_{ref}\|
-=
-\sqrt{(x-x_{ref})^2+(y-y_{ref})^2}
+d_{ref}=\|p-s_{ref}\|=\sqrt{(x-x_{ref})^2+(y-y_{ref})^2}
 $$
 
 ---
@@ -89,11 +85,7 @@ $$
 展開後：
 
 $$
-\sqrt{(x-x_i)^2+(y-y_i)^2}
--
-\sqrt{(x-x_{ref})^2+(y-y_{ref})^2}
-=
-\rho_i
+\sqrt{(x-x_i)^2+(y-y_i)^2}-\sqrt{(x-x_{ref})^2+(y-y_{ref})^2}=\rho_i
 $$
 
 這是 TDOA 定位的原始非線性方程式。
@@ -263,23 +255,13 @@ $$
 因此：
 
 $$
-d_i^2-d_{ref}^2
-=
-(x-x_i)^2+(y-y_i)^2
--
-(x-x_{ref})^2-(y-y_{ref})^2
+d_i^2-d_{ref}^2=(x-x_i)^2+(y-y_i)^2-(x-x_{ref})^2-(y-y_{ref})^2
 $$
 
 展開：
 
 $$
-d_i^2-d_{ref}^2
-=
-2x(x_{ref}-x_i)
-+
-2y(y_{ref}-y_i)
-+
-x_i^2+y_i^2-x_{ref}^2-y_{ref}^2
+d_i^2-d_{ref}^2=2x(x_{ref}-x_i)+2y(y_{ref}-y_i)+x_i^2+y_i^2-x_{ref}^2-y_{ref}^2
 $$
 
 又因為：
@@ -291,25 +273,13 @@ $$
 所以：
 
 $$
-2x(x_{ref}-x_i)
-+
-2y(y_{ref}-y_i)
-+
-x_i^2+y_i^2-x_{ref}^2-y_{ref}^2
-=
-2\rho_i r+\rho_i^2
+2x(x_{ref}-x_i)+2y(y_{ref}-y_i)+x_i^2+y_i^2-x_{ref}^2-y_{ref}^2=2\rho_i r+\rho_i^2
 $$
 
 整理成線性形式：
 
 $$
-2(x_{ref}-x_i)x
-+
-2(y_{ref}-y_i)y
--
-2\rho_i r
-=
-x_{ref}^2+y_{ref}^2-x_i^2-y_i^2+\rho_i^2
+2(x_{ref}-x_i)x+2(y_{ref}-y_i)y-2\rho_i r=x_{ref}^2+y_{ref}^2-x_i^2-y_i^2+\rho_i^2
 $$
 
 ---
@@ -428,16 +398,7 @@ u = np.linalg.lstsq(A, b, rcond=None)[0]
 取得初始位置：
 
 $$
-p_0=
-\begin{bmatrix}
-u_1\\
-u_2
-\end{bmatrix}
-=
-\begin{bmatrix}
-x\\
-y
-\end{bmatrix}
+p_0=\begin{bmatrix}u_1\\u_2\end{bmatrix}=\begin{bmatrix}x\\y\end{bmatrix}
 $$
 
 ---
@@ -462,13 +423,7 @@ $$
 展開：
 
 $$
-e_i(p)
-=
-\sqrt{(x-x_i)^2+(y-y_i)^2}
--
-\sqrt{(x-x_{ref})^2+(y-y_{ref})^2}
--
-\rho_i
+e_i(p)=\sqrt{(x-x_i)^2+(y-y_i)^2}-\sqrt{(x-x_{ref})^2+(y-y_{ref})^2}-\rho_i
 $$
 
 所有殘差組成：
@@ -504,36 +459,19 @@ $$
 對 $x$：
 
 $$
-\frac{\partial e_i}{\partial x}
-=
-\frac{x-x_i}{\|p-s_i\|}
--
-\frac{x-x_{ref}}{\|p-s_{ref}\|}
+\frac{\partial e_i}{\partial x}=\frac{x-x_i}{\|p-s_i\|}-\frac{x-x_{ref}}{\|p-s_{ref}\|}
 $$
 
 對 $y$：
 
 $$
-\frac{\partial e_i}{\partial y}
-=
-\frac{y-y_i}{\|p-s_i\|}
--
-\frac{y-y_{ref}}{\|p-s_{ref}\|}
+\frac{\partial e_i}{\partial y}=\frac{y-y_i}{\|p-s_i\|}-\frac{y-y_{ref}}{\|p-s_{ref}\|}
 $$
 
 因此：
 
 $$
-J_i(p)=
-\begin{bmatrix}
-\frac{x-x_i}{\|p-s_i\|}
--
-\frac{x-x_{ref}}{\|p-s_{ref}\|}
-&
-\frac{y-y_i}{\|p-s_i\|}
--
-\frac{y-y_{ref}}{\|p-s_{ref}\|}
-\end{bmatrix}
+J_i(p)=\begin{bmatrix}\frac{x-x_i}{\|p-s_i\|}-\frac{x-x_{ref}}{\|p-s_{ref}\|}&\frac{y-y_i}{\|p-s_i\|}-\frac{y-y_{ref}}{\|p-s_{ref}\|}\end{bmatrix}
 $$
 
 ---

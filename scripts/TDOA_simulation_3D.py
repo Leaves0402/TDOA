@@ -1,13 +1,33 @@
 """
+程式功用說明：
+本程式用來模擬「三維 TDOA 聲源定位」中，探頭間距對定位誤差的影響。
+
+主要流程：
+1. 由使用者輸入探頭間距 spacing，單位為 cm。
+2. 建立 7 顆探頭的三維陣列：
+   - 第 1 顆探頭放在原點，作為 TDOA 參考探頭。
+   - 其餘探頭分別沿著 x、y、z 軸，以 spacing 與 2*spacing 排列。
+3. 設定聲源從原點往 (1, 1, 1) 方向移動，距離為 10 m 到 100 m。
+4. 計算每個聲源位置到各探頭的到達時間 TOA。
+5. 以第 1 顆探頭為參考，計算其他探頭相對於第 1 顆探頭的 TDOA。
+6. 加入取樣率造成的時間雜訊，並用 Monte Carlo 模擬多次定位誤差。
+7. 使用 nonlinear least squares 反推出聲源位置。
+8. 輸出每個距離下的平均誤差、RMSE、median error、95 百分位誤差與失敗次數。
+9. 將結果存成 CSV，並畫出「聲源距離 vs 定位誤差」的 PNG 圖。
+
+適用目的：
+此程式可用來觀察在固定 7 探頭幾何下，當探頭間距改變時，
+TDOA 定位精度是否會改善或惡化，並評估不同聲源距離下的誤差變化。
+
 Basic 3D TDOA localization spacing simulation.
 
 This script analyzes how the distance between sensors affects localization
 error for a 7-sensor 3D TDOA array. Sensor 1 is used as the reference sensor.
 """
 
-from pathlib import Path
+from pathlib import Path  # 用來處理輸出檔案路徑，例如 CSV 與 PNG 儲存位置
 
-import matplotlib
+import matplotlib  # 用來設定繪圖後端 backend
 
 # Prefer Tk windows for interactive chart/table display and avoid Qt backend
 # issues. If Tk is not available, the script still saves CSV/PNG normally.
@@ -21,23 +41,27 @@ except Exception:
     matplotlib.use("Agg")
     GUI_AVAILABLE = False
 
-from matplotlib.figure import Figure
-import numpy as np
-import pandas as pd
-from scipy.optimize import least_squares
+from matplotlib.figure import Figure  # 建立 matplotlib 圖形物件
+import numpy as np  # 數值運算與向量/矩陣計算
+import pandas as pd  # 儲存與整理模擬結果表格
+from scipy.optimize import least_squares  # 非線性最小平方法，用來反推聲源位置
 
 
-# ---- System parameters ----
+# ---- System parameters 系統參數設定 ----
+# 聲速、取樣率、Monte Carlo 次數等參數都集中放在這裡，方便之後修改。
 SOUND_SPEED_MPS = 343.0  # m/s, speed of sound in air
 PULSE_WIDTH_S = 100e-9  # s, 100 ns pulse width. Kept for traceability.
 SAMPLING_RATE_HZ = 100_000.0  # Hz
 TIMING_NOISE_STD_S = 1.0 / (np.sqrt(12.0) * SAMPLING_RATE_HZ)  # s
 MONTE_CARLO_TRIALS = 200
 
+# 輸出的結果檔名
 CSV_FILENAME = "tdoa_spacing_result.csv"
 PLOT_FILENAME = "tdoa_error_vs_distance.png"
 
 
+# 建立七顆探頭的三維座標
+# 幾何配置為：原點 + x 軸兩顆 + y 軸兩顆 + z 軸兩顆。
 def create_sensor_array(spacing_m):
     """
     Create the fixed 7-sensor 3D array.
@@ -66,6 +90,8 @@ def create_sensor_array(spacing_m):
     )
 
 
+# 產生聲源位置
+# 聲源固定沿著 (1, 1, 1) 方向遠離原點，用來測試不同距離下的定位誤差。
 def generate_source_position(distance_m):
     """
     Generate source position along the (1, 1, 1) direction.
@@ -84,6 +110,8 @@ def generate_source_position(distance_m):
     return distance_m * unit_direction
 
 
+# 計算 TOA, Time of Arrival
+# TOA = 聲源到探頭距離 / 聲速。
 def compute_toa(source_position, sensors, sound_speed):
     """
     Compute time of arrival for each sensor.
@@ -106,6 +134,8 @@ def compute_toa(source_position, sensors, sound_speed):
     return distances / sound_speed
 
 
+# 計算 TDOA, Time Difference of Arrival
+# 這裡固定使用第 1 顆探頭作為 reference sensor。
 def compute_tdoa(toa):
     """
     Compute TDOA values using sensor 1 as the reference.
@@ -123,6 +153,8 @@ def compute_tdoa(toa):
     return toa[1:] - toa[0]
 
 
+# 對 TDOA 加入時間雜訊
+# 用來模擬實際量測中，取樣率與時間解析度造成的不確定性。
 def add_tdoa_noise(tdoa, timing_noise_std):
     """
     Add independent Gaussian timing noise to each TDOA measurement.
@@ -143,6 +175,8 @@ def add_tdoa_noise(tdoa, timing_noise_std):
     return tdoa + noise
 
 
+# 定義最小平方法的 residual function
+# least_squares 會調整 position，讓預測 TDOA 與量測 TDOA 的差距最小。
 def tdoa_residual(position, sensors, measured_tdoa, sound_speed):
     """
     Residual function for nonlinear least squares.
@@ -170,6 +204,8 @@ def tdoa_residual(position, sensors, measured_tdoa, sound_speed):
     return predicted_tdoa - measured_tdoa
 
 
+# 使用非線性最小平方法估測聲源位置
+# 輸入量測 TDOA 後，反推出最可能的三維座標。
 def estimate_position(sensors, measured_tdoa, sound_speed, initial_guess):
     """
     Estimate source position with scipy.optimize.least_squares.
@@ -209,6 +245,8 @@ def estimate_position(sensors, measured_tdoa, sound_speed, initial_guess):
     return result.x
 
 
+# 執行完整模擬流程
+# 對 10 m 到 100 m 的聲源距離逐一模擬，並在每個距離做 Monte Carlo 統計。
 def run_simulation(spacing_cm):
     """
     Run the full Monte Carlo simulation.
@@ -234,6 +272,7 @@ def run_simulation(spacing_cm):
             f"({sensor[0]:.6f}, {sensor[1]:.6f}, {sensor[2]:.6f})"
         )
 
+    # 聲源距離從 10 m 到 100 m，每 10 m 做一次模擬
     for distance_m in range(10, 101, 10):
         true_position = generate_source_position(float(distance_m))
         clean_toa = compute_toa(true_position, sensors, SOUND_SPEED_MPS)
@@ -242,6 +281,7 @@ def run_simulation(spacing_cm):
         errors_m = []
         failure_count = 0
 
+        # 同一個聲源距離重複模擬多次，統計隨機雜訊造成的誤差分布
         for _ in range(MONTE_CARLO_TRIALS):
             measured_tdoa = add_tdoa_noise(clean_tdoa, TIMING_NOISE_STD_S)
 
@@ -281,6 +321,7 @@ def run_simulation(spacing_cm):
             p95_error_m = float(np.percentile(errors_m, 95))
             relative_rmse_percent = float((rmse_m / distance_m) * 100.0)
 
+        # 將此距離下的統計結果存成一列，最後轉成 DataFrame
         rows.append(
             {
                 "distance_m": float(distance_m),
@@ -299,6 +340,8 @@ def run_simulation(spacing_cm):
     return pd.DataFrame(rows)
 
 
+# 建立誤差折線圖
+# 圖中同時顯示 RMSE error 與 Mean error。
 def create_error_figure(df, spacing_m, figsize=(9, 6), dpi=100):
     """
     Create the RMSE and mean localization error figure.
@@ -344,6 +387,7 @@ def create_error_figure(df, spacing_m, figsize=(9, 6), dpi=100):
     return fig
 
 
+# 儲存誤差圖為 PNG 檔案
 def plot_results(df, spacing_m):
     """
     Plot RMSE and mean localization error versus source distance, then save PNG.
@@ -372,6 +416,8 @@ def _format_table_value(value):
     return str(value)
 
 
+# 顯示結果視窗
+# 若系統支援 Tkinter，會開啟表格視窗與圖表視窗。
 def show_results_windows(df, spacing_m):
     """
     Show separate chart and table windows.
@@ -436,6 +482,8 @@ def show_results_windows(df, spacing_m):
     table_window.mainloop()
 
 
+# 主程式入口
+# 負責讀取使用者輸入、執行模擬、輸出 CSV/PNG、顯示結果。
 def main():
     """Read user input, run the simulation, and save outputs."""
     user_input = input("請輸入探頭間距 spacing，單位 cm，例如 50 代表 50 cm: ").strip()
@@ -459,7 +507,9 @@ def main():
     csv_path = script_dir / CSV_FILENAME
     plot_path = script_dir / PLOT_FILENAME
 
+    # 將模擬結果輸出成 CSV，方便後續用 Excel、MATLAB 或 Python 分析
     df.to_csv(csv_path, index=False)
+    # 將誤差曲線輸出成圖片
     plot_results(df, spacing_m)
 
     print("\nCSV 儲存位置:")
@@ -473,5 +523,7 @@ def main():
     show_results_windows(df, spacing_m)
 
 
+# 只有直接執行此檔案時，才會呼叫 main()。
+# 若此檔案被其他程式 import，則不會自動執行模擬。
 if __name__ == "__main__":
     main()

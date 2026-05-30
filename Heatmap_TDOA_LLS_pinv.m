@@ -1,6 +1,6 @@
 %% TDOA Localization Error Heatmap - Dynamic Area Simulation
-% ¥»ª©¥»¤w¾ã¦X¨Ï¥ÎªÌ¦Û­q©w¦ì­±¿n¡BLinear Least Squares ªì©l©w¦ì¡B
-% µêÀÀ¤Ï¯x°}¡]pinv¡^»·³õ­°¯´­×¥¿¡A¥H¤Î¨t²Î¨ú¼Ë²v¡]PRR¡^¶q¤Æ»~®t¼ÒÀÀ¡C
+% æœ¬ç‰ˆæœ¬å·²æ•´åˆä½¿ç”¨è€…è‡ªè¨‚å®šä½é¢ç©ã€Linear Least Squares åˆå§‹å®šä½ã€
+% è™›æ“¬åçŸ©é™£ï¼ˆpinvï¼‰é å ´é™ç§©ä¿®æ­£ï¼Œä»¥åŠç³»çµ±å–æ¨£ç‡ï¼ˆPRRï¼‰é‡åŒ–èª¤å·®æ¨¡æ“¬ã€‚
 
 clear; clc; close all;
 
@@ -32,21 +32,21 @@ end
 pngOutputPath = fullfile(resultsDir, 'tdoa_error_heatmap_initial_200m.png');
 csvOutputPath = fullfile(resultsDir, 'tdoa_error_percent_map_initial_200m.csv');
 
-% 1. ¨Ï¥ÎªÌ¿é¤J°Ñ¼Æ
-area_side_m = input('½Ğ¿é¤J©w¦ì½d³òÁ`Ãäªø (³æ¦ì:¤½¤Ø, ¨Ò¦p 100 ©Î 200): ');
-grid_spacing_m = input('½Ğ¿é¤J®æ½u¶¡¶Z (³æ¦ì:¤½¤Ø, ¨Ò¦p 5): ');
-PRR_Hz = input('½Ğ¿é¤J¨t²Î¨ú¼Ë²v PRR (³æ¦ì:Hz, ¨Ò¦p 20000): ');
+% 1. ä½¿ç”¨è€…è¼¸å…¥åƒæ•¸
+area_side_m = input('è«‹è¼¸å…¥å®šä½ç¯„åœç¸½é‚Šé•· (å–®ä½:å…¬å°º, ä¾‹å¦‚ 100 æˆ– 200): ');
+grid_spacing_m = input('è«‹è¼¸å…¥æ ¼ç·šé–“è· (å–®ä½:å…¬å°º, ä¾‹å¦‚ 5): ');
+PRR_Hz = input('è«‹è¼¸å…¥ç³»çµ±å–æ¨£ç‡ PRR (å–®ä½:Hz, ä¾‹å¦‚ 20000): ');
 
 if isempty(area_side_m) || area_side_m <= 0
-    area_side_m = 200; % ¹w³]­È
+    area_side_m = 200; % é è¨­å€¼
 end
 half_side = area_side_m / 2;
 
 if grid_spacing_m <= 0 || PRR_Hz <= 0
-    error('¼Æ­È¥²¶·¤j©ó 0');
+    error('æ•¸å€¼å¿…é ˆå¤§æ–¼ 0');
 end
 
-% ®Ú¾Ú¿é¤Jªº­±¿n°ÊºA«Ø¥ßÃä¬É»P¤¤¤ßÂIºô®æ
+% æ ¹æ“šè¼¸å…¥çš„é¢ç©å‹•æ…‹å»ºç«‹é‚Šç•Œèˆ‡ä¸­å¿ƒé»ç¶²æ ¼
 xEdges = -half_side:grid_spacing_m:half_side;
 yEdges = -half_side:grid_spacing_m:half_side;
 
@@ -122,7 +122,7 @@ function residuals = tdoaResiduals(p, measuredTDOA, sensors, c, refIndex)
     residuals = modelTDOA - measuredTDOA;
 end
 
-%% ½u©Ê Least Squares ­pºâ¨ç¼Æ (²Ä¤@¶¥¬q)
+%% ç·šæ€§ Least Squares è¨ˆç®—å‡½æ•¸ (ç¬¬ä¸€éšæ®µ)
 function p0 = computeInitialPositionLLS(sensors, measuredTDOA, c, refIndex)
     numSensors = size(sensors, 1);
     s_ref = sensors(refIndex, :);
@@ -147,17 +147,17 @@ function p0 = computeInitialPositionLLS(sensors, measuredTDOA, c, refIndex)
         idx = idx + 1;
     end
     
-    % ¨Ï¥ÎµêÀÀ¤Ï¯x°} (pinv) Ã­©w³B²z»·³õ³y¦¨ªº­°¯´/ªñ©_²§¯x°}Äµ§i
+    % ä½¿ç”¨è™›æ“¬åçŸ©é™£ (pinv) ç©©å®šè™•ç†é å ´é€ æˆçš„é™ç§©/è¿‘å¥‡ç•°çŸ©é™£è­¦å‘Š
     u = pinv(A) * b;
     
-    % ¨ú±o½u©Ê¥N¼Æªì©l²q´úÂI p0 = [x, y]
+    % å–å¾—ç·šæ€§ä»£æ•¸åˆå§‹çŒœæ¸¬é» p0 = [x, y]
     p0 = [u(1), u(2)];
 end 
 
 function [estimatedPosition, exitFlag] = estimatePosition( ...
     measuredTDOA, sensors, c, refIndex, initialGuess)
 
-    % Àu¥ı¨Ï¥Î lsqnonlin (Levenberg-Marquardt)
+    % å„ªå…ˆä½¿ç”¨ lsqnonlin (Levenberg-Marquardt)
     if exist('lsqnonlin', 'file') == 2
         options = optimoptions('lsqnonlin', ...
             'Algorithm', 'levenberg-marquardt', ...
@@ -171,7 +171,7 @@ function [estimatedPosition, exitFlag] = estimatePosition( ...
             @(p) tdoaResiduals(p, measuredTDOA, sensors, c, refIndex), ...
             initialGuess, [], [], options);
     else
-        % ³Æ®×¡G¦pªG¨S¦³¦w¸Ë³Ì¨Î¤Æ¤u¨ã½c¡A­°¯Å¨Ï¥Î fminsearch
+        % å‚™æ¡ˆï¼šå¦‚æœæ²’æœ‰å®‰è£æœ€ä½³åŒ–å·¥å…·ç®±ï¼Œé™ç´šä½¿ç”¨ fminsearch
         options = optimset( ...
             'Display', 'off', ...
             'MaxIter', 2000, ...
@@ -200,26 +200,26 @@ function [errorPercentMap, estimatedXMap, estimatedYMap] = buildErrorMap( ...
         for ix = 1:numX
             sourceTrue = [xCenters(ix), yCenters(iy)];
 
-            % 1. ­pºâ¯u¹ê¨ì¹F®É¶¡ (TOA)
+            % 1. è¨ˆç®—çœŸå¯¦åˆ°é”æ™‚é–“ (TOA)
             trueArrivalTimes = computeArrivalTimes(sourceTrue, sensors, c);
             
-            % 2. ¼ÒÀÀµwÅé¨ú¼Ë²v³y¦¨ªº¶q¤Æ»~®t (Quantization)
+            % 2. æ¨¡æ“¬ç¡¬é«”å–æ¨£ç‡é€ æˆçš„é‡åŒ–èª¤å·® (Quantization)
             quantizedArrivalTimes = round(trueArrivalTimes * PRR_Hz) / PRR_Hz;
             
-            % 3. ­pºâ¶q¤Æ«áªº¶q´ú TDOA
+            % 3. è¨ˆç®—é‡åŒ–å¾Œçš„é‡æ¸¬ TDOA
             sensorIndices = setdiff(1:size(sensors, 1), refIndex);
             measuredTDOA = quantizedArrivalTimes(sensorIndices) - quantizedArrivalTimes(refIndex);
 
-            % 4. ¶i¦æ¦ì¸m¦ô´ú (ºtºâªk¨â¶¥¬q¦ê³s)
-            % ¶¥¬q¤@¡G¨Ï¥Î Linear Least Squares ¨D±oªì©l¦ì¸m p0
+            % 4. é€²è¡Œä½ç½®ä¼°æ¸¬ (æ¼”ç®—æ³•å…©éšæ®µä¸²é€£)
+            % éšæ®µä¸€ï¼šä½¿ç”¨ Linear Least Squares æ±‚å¾—åˆå§‹ä½ç½® p0
             p0 = computeInitialPositionLLS(sensors, measuredTDOA, c, refIndex);
             
-            % ­Y½u©Ê¸Ñµo´²©Î²£¥Í NaN¡A«h¸õ¹L¦¹ÂI
+            % è‹¥ç·šæ€§è§£ç™¼æ•£æˆ–ç”¢ç”Ÿ NaNï¼Œå‰‡è·³éæ­¤é»
             if any(~isfinite(p0))
                 continue;
             end
 
-            % ¶¥¬q¤G¡G±N p0 §@¬°¦X²z°_©lÂI¡A§ë¤J LM ºtºâªk¶i¦æ«D½u©Ê³Ì¨Î¤Æ­×¥¿
+            % éšæ®µäºŒï¼šå°‡ p0 ä½œç‚ºåˆç†èµ·å§‹é»ï¼ŒæŠ•å…¥ LM æ¼”ç®—æ³•é€²è¡Œéç·šæ€§æœ€ä½³åŒ–ä¿®æ­£
             [estimatedPosition, exitFlag] = estimatePosition( ...
                 measuredTDOA, sensors, c, refIndex, p0);
             
@@ -266,12 +266,12 @@ function fig = plotErrorHeatmap(classMap, xCenters, yCenters, sensors, grid_spac
     grid on;
     ax = gca;
     
-    % °ÊºA­pºâ¥D­n¨è«×¨Bªø¡]±Nµe­±§¡¤Ã¤À¦¨ 4 ­Ó°Ï¶¡¡A§e²{ 5 ­Ó¥D­n¼ĞÅÒ¼Æ¦r¡^
+    % å‹•æ…‹è¨ˆç®—ä¸»è¦åˆ»åº¦æ­¥é•·ï¼ˆå°‡ç•«é¢å‡å‹»åˆ†æˆ 4 å€‹å€é–“ï¼Œå‘ˆç¾ 5 å€‹ä¸»è¦æ¨™ç±¤æ•¸å­—ï¼‰
     tick_step = half_side / 2;
     ax.XTick = -half_side:tick_step:half_side;
     ax.YTick = -half_side:tick_step:half_side;
 
-    % ¶}±Ò¦¸­nºô®æ½u¡A¨Ã°ÊºA³]©w¬°²Å¦X¿é¤Jªº®æ½u¶¡¶Z
+    % é–‹å•Ÿæ¬¡è¦ç¶²æ ¼ç·šï¼Œä¸¦å‹•æ…‹è¨­å®šç‚ºç¬¦åˆè¼¸å…¥çš„æ ¼ç·šé–“è·
     ax.XMinorGrid = 'on';
     ax.YMinorGrid = 'on';
     ax.XAxis.MinorTickValues = -half_side:grid_spacing_m:half_side;
@@ -305,7 +305,7 @@ function fig = plotErrorHeatmap(classMap, xCenters, yCenters, sensors, grid_spac
         half_side*2, half_side*2, grid_spacing_m), 'FontSize', 11, 'FontWeight', 'bold');
 
     hold on;
-    % Ã¸»s·P´ú¾¹¦ì¸m
+    % ç¹ªè£½æ„Ÿæ¸¬å™¨ä½ç½®
     plot(sensors(:, 1), sensors(:, 2), 'ko', ...
         'MarkerFaceColor', 'w', 'MarkerSize', 6, 'LineWidth', 1.5);
     

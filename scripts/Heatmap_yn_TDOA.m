@@ -21,8 +21,52 @@ sensors = [
 refIndex = 1;
 c = 343.0;        % 聲速 (m/s)
 
+sensor_plot_filename = 'sensor_geometry.png';   % 探頭位置圖輸出檔名
+
 % 透過 mean 計算出固定的初始猜測點 p0，稍微偏移 1 毫米 (0.001m)，避開原點奇異點
 p0 = mean(sensors, 1)' + [0.001; 0.001];
+
+%% ============================================================
+% 額外輸出：2D 探頭位置圖
+% ============================================================
+
+figure('Color', 'w', 'Position', [200, 120, 800, 650]);
+hold on; grid on; box on; axis equal;
+
+% 繪製探頭位置
+plot(sensors(:,1), sensors(:,2), 'ro', ...
+    'MarkerFaceColor', 'r', ...
+    'MarkerSize', 8, ...
+    'LineWidth', 1.5);
+
+% 標記 S1, S2, S3...
+for k = 1:size(sensors, 1)
+    text(sensors(k,1) + 0.03, sensors(k,2) + 0.02, ...
+        sprintf('S%d', k), ...
+        'FontSize', 13, ...
+        'FontWeight', 'bold', ...
+        'Color', 'k');
+end
+
+% 自動設定座標範圍
+max_range = max(abs(sensors(:))) + 0.25;
+xlim([-max_range, max_range]);
+ylim([-max_range, max_range]);
+
+xlabel('x (m)', 'FontSize', 12);
+ylabel('y (m)', 'FontSize', 12);
+
+% 取得探頭間距，這裡用 S1 到 S2 的距離
+spacing_m = norm(sensors(2,:) - sensors(1,:));
+
+title(sprintf('2D Sensor Geometry, spacing = %.2f m', spacing_m), ...
+    'FontSize', 14, ...
+    'FontWeight', 'bold');
+
+% 儲存圖片
+exportgraphics(gcf, sensor_plot_filename, 'Resolution', 300);
+
+hold off;
 
 %% ============================================================
 % 2. 使用者互動輸入與網格建立

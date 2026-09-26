@@ -203,21 +203,9 @@ d_i^2-d_{\mathrm{ref}}^2
 
 ```math
 \begin{aligned}
-d_i^2-d_{\mathrm{ref}}^2
-={}&
-2x(x_{\mathrm{ref}}-x_i)
-+
-2y(y_{\mathrm{ref}}-y_i)\\
-&+
-2z(z_{\mathrm{ref}}-z_i)
-+
-x_i^2+y_i^2+z_i^2\\
-&-
-x_{\mathrm{ref}}^2
--
-y_{\mathrm{ref}}^2
--
-z_{\mathrm{ref}}^2
+d_i^2-d_{\mathrm{ref}}^2={}&2(x_{\mathrm{ref}}-x_i)x
++2(y_{\mathrm{ref}}-y_i)y+2(z_{\mathrm{ref}}-z_i)z\\
+&+x_i^2+y_i^2+z_i^2-x_{\mathrm{ref}}^2-y_{\mathrm{ref}}^2-z_{\mathrm{ref}}^2
 \end{aligned}
 ```
 
@@ -225,27 +213,10 @@ z_{\mathrm{ref}}^2
 
 ```math
 \begin{aligned}
-2(x_{\mathrm{ref}}-x_i)x
-&+
-2(y_{\mathrm{ref}}-y_i)y
-+
-2(z_{\mathrm{ref}}-z_i)z\\
-&-
-2\rho_i r\\
-={}&
-x_{\mathrm{ref}}^2
-+
-y_{\mathrm{ref}}^2
-+
-z_{\mathrm{ref}}^2\\
-&-
-x_i^2
--
-y_i^2
--
-z_i^2
-+
-\rho_i^2
+&2(x_{\mathrm{ref}}-x_i)x
++2(y_{\mathrm{ref}}-y_i)y+2(z_{\mathrm{ref}}-z_i)z
+-2\rho_i r\\
+&=x_{\mathrm{ref}}^2+y_{\mathrm{ref}}^2+z_{\mathrm{ref}}^2-x_i^2-y_i^2-z_i^2+\rho_i^2
 \end{aligned}
 ```
 
@@ -307,7 +278,7 @@ b\in\mathbb{R}^{N-1}
 另外需滿足：
 
 ```math
-\operatorname{rank}(A)=4
+\mathrm{rank}(A)=4
 ```
 
 若感測器配置使矩陣秩不足，便無法得到唯一的三維線性初始解。

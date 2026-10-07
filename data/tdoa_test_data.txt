@@ -1,0 +1,39 @@
+case:S1
+true_positions_cm:[60, 60]
+arrival_times_s(TOA):[3.22266; 3.22236; 3.22264; 3.22264; 3.22216; 3.22244;]
+
+case:S2
+true_positions_cm:[60, 100]
+arrival_times_s(TOA):[3.24174; 3.24154; 3.24178; 3.24156; 3.24074; 3.24032;]
+
+case:S3
+true_positions_cm:[100, 60]
+arrival_times_s(TOA):[7.12960; 7.12996; 7.13072; 7.13096; 7.13066; 7.13084;]
+
+case:S4
+true_positions_cm:[100, 100]
+arrival_times_s(TOA):[2.18198; 2.18216; 2.18274; 2.18274; 2.18212; 2.18190;]
+
+case:S5
+true_positions_cm:[100, -60]
+arrival_times_s(TOA):[9.11326; 9.11354; 9.11430; 9.11524; 9.11602; 9.11696;]
+
+case:S6
+true_positions_cm:[60, -60]
+arrival_times_s(TOA):[13.15450; 13.15410; 13.15450; 13.15520; 13.15610; 13.15720;]
+
+case:S7
+true_positions_cm:[20, -60]
+arrival_times_s(TOA):[6.44862; 6.44778; 6.44736; 6.44798; 6.44906; 6.45024;]
+
+case:S8
+true_positions_cm:[-60, 20]
+arrival_times_s(TOA):[9.20160; 9.20052; 9.19930; 9.19872; 9.19912; 9.19998;]
+
+case:S9
+true_positions_cm:[-60, 60]
+arrival_times_s(TOA):[9.15182; 9.15082; 9.14978; 9.14898; 9.14858; 9.14888;]
+
+case:S10
+true_positions_cm:[-60, 100]
+arrival_times_s(TOA):[2.91020; 2.90926; 2.90840; 2.90760; 2.90676; 2.90654;]

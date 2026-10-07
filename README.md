@@ -6,8 +6,7 @@
 | --- | --- |
 | [TDOA_math.md](TDOA_math.md) | TDOA 數學推導（目前為 3D 筆記）。 |
 | [tdoa_localization_2d.m](tdoa_localization_2d.m) | 2D 定位演算法，使用 Linear LS 初始解與 LM 修正；三顆感測器直接以原點初始化。 |
-| [data/](data/) | TOA 測資，待上傳。 |
+| [data/](data/) | 10 組實測 TOA 與真實聲源座標，以 MATLAB 程式儲存。 |
 | [results/](results/) | 定位結果圖，待上傳。 |
 
 執行程式需要 MATLAB 與 Optimization Toolbox；目前測資設定於程式內。
-
